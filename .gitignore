@@ -1,160 +1,93 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+from math import nan
+from unicodedata import numeric
+import pandas as pd
+import matplotlib.pyplot as plt
 
-# C extensions
-*.so
+# Define a function to calculate the mean
+def calculate_mean(data):
+    sum = 0
+    for x in data:
+        sum+=x
+    return sum / len(data)
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# Define a function to calculate the variance
+def calculate_variance(data):
+    mean = calculate_mean(data)
+    return sum((x - mean) ** 2 for x in data) / (len(data) - 1)
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+# Define a function to calculate the standard deviation
+def calculate_standard_deviation(data):
+    return calculate_variance(data) ** 0.5
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# Define a function to calculate the z-scores
+def calculate_z_scores(data):
+    mean = calculate_mean(data)
+    std_dev = calculate_standard_deviation(data)
+    return [(x - mean) / std_dev for x in data]
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+# Define a function to calculate Q1, median (Q2), and Q3
+def calculate_quartiles(data):
+    
+    data_sorted = sorted(data)
+    n = len(data_sorted)
+    q1_index = n // 4
+    print("length",n)
+    if n%2 == 0:
+        median = (data_sorted[n//2-1] + data_sorted[(n//2)])/2
+        print(data_sorted[n//2],data_sorted[(n//2)+1])
+    else:
+        median = data_sorted[n//2]
+    q3_index = (3 * n) // 4
+    return data_sorted[q1_index], median, data_sorted[q3_index]
 
-# Translations
-*.mo
-*.pot
+# Read the data from the Excel file
+df = pd.read_excel("original_diabetes.xlsx")
+df = df.dropna(how="all")
+# Extract the "Glucose" and "BloodPressure" columns
+glucose_data = df["Glucose"]
+blood_pressure_data = df["BloodPressure"]
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+print(glucose_data)
 
-# Flask stuff:
-instance/
-.webassets-cache
+# Calculate statistics for "Glucose"
+glucose_mean = calculate_mean(glucose_data)
+glucose_variance = calculate_variance(glucose_data)
+glucose_std_dev = calculate_standard_deviation(glucose_data)
+glucose_z_scores = calculate_z_scores(glucose_data)
+glucose_q1, glucose_median, glucose_q3 = calculate_quartiles(glucose_data)
 
-# Scrapy stuff:
-.scrapy
+# Calculate statistics for "BloodPressure"
+blood_pressure_mean = calculate_mean(blood_pressure_data)
+blood_pressure_variance = calculate_variance(blood_pressure_data)
+blood_pressure_std_dev = calculate_standard_deviation(blood_pressure_data)
+blood_pressure_z_scores = calculate_z_scores(blood_pressure_data)
+blood_pressure_q1, blood_pressure_median, blood_pressure_q3 = calculate_quartiles(blood_pressure_data)
 
-# Sphinx documentation
-docs/_build/
+# Print the statistics for "Glucose"
+print("Statistics for Glucose:")
+print("Mean:", glucose_mean)
+print("Variance:", glucose_variance)
+print("Standard Deviation:", glucose_std_dev)
+print("Z-scores:", glucose_z_scores)
+print("Single z score average:", (sum(glucose_z_scores) // len(glucose_data)))
+print("Q1:", glucose_q1)
+print("Median (Q2):", glucose_median)
+print("Q3:", glucose_q3)
 
-# PyBuilder
-.pybuilder/
-target/
+# Print the statistics for "BloodPressure"
+print("\nStatistics for BloodPressure:")
+print("Mean:", blood_pressure_mean)
+print("Variance:", blood_pressure_variance)
+print("Standard Deviation:", blood_pressure_std_dev)
+print("Z-scores:", blood_pressure_z_scores)
+print("Single z score average:", (sum(blood_pressure_z_scores) // len(blood_pressure_data)))
+print("Q1:", blood_pressure_q1)
+print("Median (Q2):", blood_pressure_median)
+print("Q3:", blood_pressure_q3)
 
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/#use-with-ide
-.pdm.toml
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+# Plot boxplots of "Glucose" and "BloodPressure"
+plt.boxplot([glucose_data, blood_pressure_data], labels=["Glucose", "BloodPressure"])
+plt.title("Boxplots of Glucose and BloodPressure")
+plt.xlabel("Variables")
+plt.ylabel("Values")
+plt.show()
